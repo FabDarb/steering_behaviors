@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Steering Behavior</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+    <!-- Bootstrap CSS v5.2.1 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
+</head>
+
+<body>
+
+    <div style="display:flex; align-items: center; justify-content: center;">
+        <canvas id="cnvDisplay" width="1200" height="700" style="background-color: #CAE3FF;"></canvas>
+    </div>
+    <script type="module">
+        import Agent from "./src/objects/agent.mjs";
+        import Vector from "./src/objects/vector.mjs";
+        import PointerStat from "./src/objects/pointer_stat.mjs";
+        import GreenModul from "./src/personal_modul/green_modul.mjs";
+        import YellowModul from "./src/personal_modul/yellow_modul.mjs";
+        import Ball from "./src/objects/ball.mjs";
+        import Wall from "./src/objects/wall.mjs";
+        import Path from "./src/objects/path.mjs";
+        import { globalConfig } from "./src/config.mjs";
+        const cnv = document.getElementById('cnvDisplay');
+        const ball = new Ball("red", 60, 170, new Vector(2, 4), 10);
+        const ctx = cnv.getContext("2d");
+        const pointer = new PointerStat(new Vector(800, 200));
+        const agents = [];
+        const walls = [];
+        const trainPath = new Path();
+        const nods = [];
+        init();
+
+
+        function init() {
+            cnv.addEventListener('mousedown', function (event) {
+                const x = event.x - cnv.offsetLeft;
+                const y = event.y - cnv.offsetTop;
+                for (let i = 1; i <= globalConfig.number_agents; ++i) {
+                    const agent = new Agent(agents.length + 1, new Vector(x + i * 5, y), ctx, globalConfig.agent_size.y, globalConfig.agent_size.x, "green", walls, null);
+                    agent.setModul = new GreenModul(agents, agent);
+                    agent.modul.setTargetToEvade = agents[0];
+                    agents.push(agent);
+                }
+            });
+            trainPath.setNods = [
+                new Vector(60, 60),
+                new Vector(60, globalConfig.height - 60),
+                new Vector(globalConfig.width - 60, globalConfig.height - 60),
+                new Vector(globalConfig.width - 60, 60),
+            ];
+            for (const trainNod of trainPath.getNods) {
+                nods.push(new Ball("orange", trainNod.x, trainNod.y, new Vector(2, 4), 10));
+            }
+            drawBackground();
+            setInterval(update, 20);
+            setInterval(spawnTrain, 10000);
+            // spawnTrain();
+        }
+        function update() {
+            ctx.clearRect(0, 0, cnv.clientWidth, cnv.clientHeight);
+            pointer.setNewPosition(new Vector(ball.x, ball.y));
+            ball.generateBall(ctx);
+            for (const nod of nods) {
+                nod.generateBall(ctx);
+            }
+            for (const wall of walls) {
+                wall.draw();
+            }
+            for (const agent of agents) {
+                if (agent.modul instanceof YellowModul) {
+                    agent.update(trainPath.getNods[agent.modul.pathIndex]);
+                } else {
+                    agent.update(pointer.position);
+                }
+            }
+        }
+        function spawnTrain() {
+            const agent = new Agent(agents.length + 1, new Vector(80, 0), ctx, globalConfig.agent_size.y, globalConfig.agent_size.x, "yellow", walls, null);
+            agent.setModul = new YellowModul(agent, agents, 0);
+            agents.push(agent);
+
+        }
+        function drawBackground() {
+            const wall1 = new Wall(120, 100, new Vector(globalConfig.width - 240, 20), ctx);
+            const wall2 = new Wall(120, globalConfig.height - 140, new Vector(globalConfig.width - 240, 20), ctx);
+            const wall3 = new Wall(globalConfig.width - 140, 100, new Vector(20, globalConfig.height - 240), ctx);
+            const wall4 = new Wall(120, 240, new Vector(20, globalConfig.height - 370), ctx);
+            walls.push(wall1, wall2, wall3, wall4);
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
+        integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>
