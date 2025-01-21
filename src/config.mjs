@@ -18,4 +18,6 @@ export const globalConfig = {
     "bumpForce": 0.5,
     //agent
     "detectRadius": 50,
+    //leader_following
+    "evade_leader_radius": 20,
 };

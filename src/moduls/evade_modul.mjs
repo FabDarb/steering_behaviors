@@ -14,9 +14,9 @@ export default class EvadeModul extends Modul {
     }
     calculVelocity(cPosition, position, velocity) {
         if (this.target != null) {
-            const distance = Vector.subtract(this.target.position, position).length();
+            const distance = Vector.subtract(cPosition, position).length();
             const timeToFutureTargetPos = distance / this.maxSpeed;
-            const futurePos = Vector.multi(Vector.addition(this.target.position, this.target.currentVelocity), timeToFutureTargetPos);
+            const futurePos = Vector.multi(Vector.addition(cPosition, this.target.currentVelocity), timeToFutureTargetPos);
             return this.fleeModul.calculVelocity(futurePos, position, velocity);
         }
         return new Vector(0, 0);
