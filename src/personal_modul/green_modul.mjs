@@ -16,15 +16,25 @@ export default class GreenModul extends Modul {
         this.alignModul = new AlignModul(this.agents, this.agent);
         this.cohesionModul = new CohesionModul(this.agents, this.agent);
         this.evadeModul = new EvadeModul(agent);
+        this.leader = null;
     }
     set setTargetToEvade(value) {
         this.evadeModul.setTarget = value;
     }
+    set setLeader(value) {
+        this.leader = value;
+    }
     calculVelocity(cPosition, position, velocity) {
-        const repulsForce = this.separateModul.calculVelocity(cPosition, position, velocity);
-        const seekForce = Vector.multi(this.seekModul.calculVelocity(cPosition, position, velocity), 1);
-        //const evadeForce = Vector.multi(this.evadeModul.calculVelocity(cPosition, position, velocity), 1);
-        const totalSteer = this.applyForce([repulsForce, seekForce]);
+        let totalSteer = new Vector(0, 0);
+        const steers = [];
+        steers.push(this.separateModul.calculVelocity(cPosition, position, velocity));
+        if (this.leader == null) {
+            steers.push(Vector.multi(this.seekModul.calculVelocity(cPosition, position, velocity), 1));
+            //const evadeForce = Vector.multi(this.evadeModul.calculVelocity(cPosition, position, velocity), 1);
+        } else {
+
+        }
+        totalSteer = this.applyForce(steers);
         return totalSteer;
     }
 }

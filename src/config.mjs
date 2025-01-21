@@ -6,7 +6,7 @@ export const globalConfig = {
     "agent_size": new Vector(30, 20),
     "number_train": 5,
     //cohésion, align
-    "number_agents": 100,
+    "number_agents": 10,
     //modul
     "defaultMaxForce": 4,
     "maxSpeed": 4,
@@ -16,4 +16,6 @@ export const globalConfig = {
     //separate
     "proxiSeparateRing": 50,
     "bumpForce": 0.5,
+    //agent
+    "detectRadius": 50,
 };

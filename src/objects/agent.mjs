@@ -1,4 +1,5 @@
 import Vector from "./vector.mjs";
+import { globalConfig } from "../config.mjs";
 export default class Agent {
     constructor(id, position, ctx, height, width, color, walls, modul) {
         this.id = id;
@@ -13,12 +14,19 @@ export default class Agent {
         this.acceleration = new Vector(0, 0);
         this.modul = modul;
         this.currentVelocity = new Vector(0, 0);
+        this.destination = null;
     }
     get getModul() {
         return this.modul;
     }
     set setModul(value) {
         this.modul = value;
+    }
+    get detectRadius() {
+        return globalConfig.detectRadius;
+    }
+    set setDestination(value) {
+        this.destination = value;
     }
     draw() {
         this.ctx.save();
@@ -35,12 +43,21 @@ export default class Agent {
         this.ctx.fill();
         this.ctx.restore();
     }
-    update(destination) {
-        this.angle = this.calculateAngle(destination.x, destination.y);
-        this.acceleration = this.move(new Vector(destination.x, destination.y));
+    detectTrain(trains) {
+        for (const train of trains) {
+            const distanceTo = Vector.subtract(train.position, this.position).length();
+            if (distanceTo <= this.detectRadius && this.modul.leader == null) {
+                this.modul.setLeader = train;
+                console.log("detect leader");
+            }
+        }
+    }
+    update() {
+        this.angle = this.calculateAngle(this.destination.x, this.destination.y);
+        this.acceleration = this.move(new Vector(this.destination.x, this.destination.y));
         this.position = Vector.addition(this.position, this.currentVelocity);
         if (this.modul == null) {
-            this.currentVelocity = this.move(new Vector(destination.x, destination.y));
+            this.currentVelocity = this.move(new Vector(this.destination.x, this.destination.y));
         } else {
             this.currentVelocity = Vector.addition(this.acceleration, this.currentVelocity);
         }
