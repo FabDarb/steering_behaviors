@@ -32,6 +32,8 @@
         const ctx = cnv.getContext("2d");
         const pointer = new PointerStat(new Vector(800, 200));
         const agents = [];
+        let numberOfTrain = globalConfig.number_train;
+        let trainInterval;
         const walls = [];
         const trainPath = new Path();
         const nods = [];
@@ -60,8 +62,7 @@
             }
             drawBackground();
             setInterval(update, 20);
-            setInterval(spawnTrain, 10000);
-            // spawnTrain();
+            trainInterval = setInterval(spawnTrain, 10000);
         }
         function update() {
             ctx.clearRect(0, 0, cnv.clientWidth, cnv.clientHeight);
@@ -85,7 +86,10 @@
             const agent = new Agent(agents.length + 1, new Vector(80, 0), ctx, globalConfig.agent_size.y, globalConfig.agent_size.x, "yellow", walls, null);
             agent.setModul = new YellowModul(agent, agents, 0);
             agents.push(agent);
-
+            --numberOfTrain;
+            if (numberOfTrain == 0) {
+                clearInterval(trainInterval);
+            }
         }
         function drawBackground() {
             const wall1 = new Wall(120, 100, new Vector(globalConfig.width - 240, 20), ctx);

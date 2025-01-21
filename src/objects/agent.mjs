@@ -45,7 +45,6 @@ export default class Agent {
             this.currentVelocity = Vector.addition(this.acceleration, this.currentVelocity);
         }
 
-
         this.acceleration = Vector.multi(this.acceleration, 0);
         this.draw();
     }

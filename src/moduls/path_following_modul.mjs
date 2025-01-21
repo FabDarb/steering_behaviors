@@ -10,7 +10,7 @@ export default class PathFollowingModul extends Modul {
         this.seekModul = new SeekModul(agent.walls, this.agent, false);
     }
     get pathRadius() {
-        return 10;
+        return 5;
     }
     set setLatestNode(value) {
         this.latestNode = value;
@@ -20,23 +20,20 @@ export default class PathFollowingModul extends Modul {
     }
     calculVelocity(cPosition, position, velocity) {
         let steer = new Vector(0, 0);
-        const predictPos = Vector.addition(position, velocity);
+        const predictPos = Vector.addition(position, Vector.multi(velocity, 12));
         if (this.latestNode != null) {
-            const distanceOf = Vector.subtract(cPosition, this.latestNode);
-            const absDistanceOf = new Vector(Math.abs(distanceOf.x), Math.abs(distanceOf.y));
-            const reverseSimpleDist = new Vector(absDistanceOf.y == 0 ? 0 : 1, absDistanceOf.x == 0 ? 0 : 1);
-            const predictPosWithReverse = Vector.multiplication(predictPos, reverseSimpleDist);
-            const minValuePredict = Math.max(predictPosWithReverse.x, predictPosWithReverse.y);
-            const pointWithReverse = Vector.multiplication(cPosition, reverseSimpleDist);
-            const minValuePoint = Math.max(pointWithReverse.x, pointWithReverse.y);
-            if (minValuePredict > minValuePoint + this.pathRadius || minValuePredict < minValuePoint - this.pathRadius) {
-                const target = new Vector(distanceOf.x == 0 ? minValuePoint : predictPos.x, distanceOf.y == 0 ? minValuePoint : predictPos.y);
+            let distanceOfPredict = Vector.subtract(predictPos, position);
+            let distanceOfDestin = Vector.subtract(cPosition, position);
+            distanceOfDestin = Vector.normalized(distanceOfDestin);
+            let projectionPoint = Vector.dot(distanceOfPredict, distanceOfDestin);
+            distanceOfDestin = Vector.multi(distanceOfDestin, projectionPoint);
+            const point = Vector.addition(distanceOfDestin, position);
+            const distanceOfPoint = Vector.subtract(point, predictPos).length();
+            if (distanceOfPoint > this.pathRadius) {
+                const target = point;
                 const seekForce = this.seekModul.calculVelocity(target, position, velocity);
                 steer = seekForce;
             }
-            //  else {
-            //     steer = this.seekModul.calculVelocity(cPosition, position, velocity);
-            // }
         } else {
             const seekForce = this.seekModul.calculVelocity(cPosition, position, velocity);
             steer = seekForce;

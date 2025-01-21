@@ -14,7 +14,7 @@ export default class YellowModul extends Modul {
 
     calculVelocity(cPosition, position, velocity) {
         const pathForce = this.pathFollowingModul.calculVelocity(cPosition, position, velocity);
-        if (Vector.subtract(cPosition, position).length() <= 25) {
+        if (Vector.subtract(cPosition, position).length() <= 35) {
             ++this.pathIndex;
             if (this.pathFollowingModul.getLatestNode == null || (this.pathFollowingModul.getLatestNode.x != cPosition.x || this.pathFollowingModul.getLatestNode.y != cPosition.y)) {
                 this.pathFollowingModul.setLatestNode = cPosition;

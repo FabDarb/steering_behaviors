@@ -47,5 +47,7 @@ export default class Vector {
         const rxy = Math.sqrt(cx + cy);
         return rxy;
     }
-
+    static dot(vectA, vectB) {
+        return vectA.x * vectB.x + vectA.y * vectB.y;
+    }
 }
