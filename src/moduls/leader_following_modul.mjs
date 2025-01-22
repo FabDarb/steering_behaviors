@@ -15,8 +15,11 @@ export default class LeaderFollowingModul extends Modul {
     get evadeLeaderRadius() {
         return globalConfig.evade_leader_radius;
     }
+    get maxDistanceToLeader() {
+        return globalConfig.max_distance_to_leader;
+    }
     calculVelocity(cPosition, position, velocity) {
-        const target = Vector.subtract(this.leader.position, this.leader.currentVelocity);
+        const target = Vector.subtract(this.leader.position, Vector.multi(this.leader.currentVelocity, this.maxDistanceToLeader));
         const steers = [];
         const leaderFuture = Vector.addition(this.leader.position, this.leader.currentVelocity);
         const distanceToLeader = Vector.subtract(leaderFuture, position).length();

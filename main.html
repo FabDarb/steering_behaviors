@@ -12,7 +12,7 @@
         integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
 </head>
 
-<body>
+<body id="body">
 
     <div style="display:flex; align-items: center; justify-content: center;">
         <canvas id="cnvDisplay" width="1200" height="700" style="background-color: #CAE3FF;"></canvas>
@@ -28,6 +28,7 @@
         import Path from "./src/objects/path.mjs";
         import { globalConfig } from "./src/config.mjs";
         const cnv = document.getElementById('cnvDisplay');
+        const body = document.getElementById('body');
         const ball = new Ball("red", 60, 170, new Vector(2, 4), 10);
         const ctx = cnv.getContext("2d");
         const pointer = new PointerStat(new Vector(800, 200));
@@ -38,6 +39,7 @@
         const trainPath = new Path();
         const trainAgents = [];
         const nods = [];
+        let debugMod = false;
         init();
 
 
@@ -51,6 +53,11 @@
                     agent.setDestination = pointer.position;
                     agent.modul.setTargetToEvade = agents[0];
                     agents.push(agent);
+                }
+            });
+            body.addEventListener('keydown', (event) => {
+                if (event.key == "d") {
+                    debugMod = !debugMod;
                 }
             });
             trainPath.setNods = [
@@ -69,12 +76,12 @@
         function update() {
             ctx.clearRect(0, 0, cnv.clientWidth, cnv.clientHeight);
             pointer.setNewPosition(new Vector(ball.x, ball.y));
-            //deletable
-            ball.generateBall(ctx);
-            for (const nod of nods) {
-                nod.generateBall(ctx);
+            if (debugMod) {
+                ball.generateBall(ctx);
+                for (const nod of nods) {
+                    nod.generateBall(ctx);
+                }
             }
-            //end
             for (const wall of walls) {
                 wall.draw();
             }

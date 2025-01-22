@@ -6,7 +6,7 @@ export const globalConfig = {
     "agent_size": new Vector(30, 20),
     "number_train": 5,
     //cohésion, align
-    "number_agents": 10,
+    "number_agents": 1,
     //modul
     "defaultMaxForce": 4,
     "maxSpeed": 4,
@@ -20,4 +20,5 @@ export const globalConfig = {
     "detectRadius": 50,
     //leader_following
     "evade_leader_radius": 20,
+    "max_distance_to_leader": 25,
 };

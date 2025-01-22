@@ -48,7 +48,6 @@ export default class Agent {
             const distanceTo = Vector.subtract(train.position, this.position).length();
             if (distanceTo <= this.detectRadius && this.modul.leader == null) {
                 this.modul.setLeader = train;
-                console.log("detect leader");
             }
         }
     }
