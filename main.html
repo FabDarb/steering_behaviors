@@ -23,6 +23,7 @@
         import PointerStat from "./src/objects/pointer_stat.mjs";
         import GreenModul from "./src/personal_modul/green_modul.mjs";
         import YellowModul from "./src/personal_modul/yellow_modul.mjs";
+        import ObjectPool from "./src/objects/object_pool.mjs";
         import Ball from "./src/objects/ball.mjs";
         import Wall from "./src/objects/wall.mjs";
         import Path from "./src/objects/path.mjs";
@@ -39,7 +40,9 @@
         const trainPath = new Path();
         const trainAgents = [];
         const nods = [];
+        let deleteId = null;
         let debugMod = false;
+        const objectPool = new ObjectPool();
         init();
 
 
@@ -48,7 +51,8 @@
                 const x = event.x - cnv.offsetLeft;
                 const y = event.y - cnv.offsetTop;
                 for (let i = 1; i <= globalConfig.number_agents; ++i) {
-                    const agent = new Agent(agents.length + 1, new Vector(x + i * 5, y), ctx, globalConfig.agent_size.y, globalConfig.agent_size.x, "green", walls, null);
+                    const agent = objectPool.acquire(() => new Agent());
+                    agent.setValueOnCreate(agents.length + 1, new Vector(x + i * 5, y), ctx, globalConfig.agent_size.y, globalConfig.agent_size.x, "green", walls, null);
                     agent.setModul = new GreenModul(agents, agent);
                     agent.setDestination = pointer.position;
                     agent.modul.setTargetToEvade = agents[0];
@@ -85,18 +89,38 @@
             for (const wall of walls) {
                 wall.draw();
             }
+            for (const train of trainAgents) {
+                if (Vector.subtract(trainPath.getNods[0], train.position).length() <= 10) {
+                    deleteId = train.id;
+                }
+            }
+            const deletingAgent = [];
             for (const agent of agents) {
                 if (agent.modul instanceof YellowModul) {
                     agent.setDestination = trainPath.getNods[agent.modul.pathIndex];
                     agent.update();
                 } else {
-                    agent.detectTrain(trainAgents);
-                    agent.update();
+                    if (agent.modul.leader != null && agent.modul.leader.id == deleteId) {
+                        objectPool.release(agent);
+                        deletingAgent.push(agent);
+                    } else {
+                        agent.detectTrain(trainAgents);
+                        agent.update();
+                    }
+
                 }
             }
+            if (deletingAgent.length > 0) {
+                for (const agent of deletingAgent) {
+                    const index = agents.indexOf(agent);
+                    agents.splice(index, 1);
+                }
+            }
+            deleteId = null;
         }
         function spawnTrain() {
-            const agent = new Agent(agents.length + 1, new Vector(80, 0), ctx, globalConfig.agent_size.y, globalConfig.agent_size.x, "yellow", walls, null);
+            const agent = new Agent();
+            agent.setValueOnCreate(agents.length + 1, new Vector(80, 0), ctx, globalConfig.agent_size.y, globalConfig.agent_size.x, "yellow", walls, null);
             agent.setModul = new YellowModul(agent, agents, 0);
             agents.push(agent);
             trainAgents.push(agent);

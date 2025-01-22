@@ -1,7 +1,22 @@
 import Vector from "./vector.mjs";
 import { globalConfig } from "../config.mjs";
 export default class Agent {
-    constructor(id, position, ctx, height, width, color, walls, modul) {
+    constructor() {
+        this.reset();
+    }
+    get getModul() {
+        return this.modul;
+    }
+    set setModul(value) {
+        this.modul = value;
+    }
+    get detectRadius() {
+        return globalConfig.detectRadius;
+    }
+    set setDestination(value) {
+        this.destination = value;
+    }
+    setValueOnCreate(id, position, ctx, height, width, color, walls, modul) {
         this.id = id;
         this.position = position;
         this.ctx = ctx;
@@ -16,17 +31,20 @@ export default class Agent {
         this.currentVelocity = new Vector(0, 0);
         this.destination = null;
     }
-    get getModul() {
-        return this.modul;
-    }
-    set setModul(value) {
-        this.modul = value;
-    }
-    get detectRadius() {
-        return globalConfig.detectRadius;
-    }
-    set setDestination(value) {
-        this.destination = value;
+    reset() {
+        this.id = null;
+        this.position = null;
+        this.ctx = null;
+        this.height = null;
+        this.width = null;
+        this.angle = 0;
+        this.speed = 4;
+        this.color = null;
+        this.walls = null;
+        this.acceleration = new Vector(0, 0);
+        this.modul = null;
+        this.currentVelocity = new Vector(0, 0);
+        this.destination = null;
     }
     draw() {
         this.ctx.save();
