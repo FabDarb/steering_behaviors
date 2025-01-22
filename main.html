@@ -50,14 +50,7 @@
             cnv.addEventListener('mousedown', function (event) {
                 const x = event.x - cnv.offsetLeft;
                 const y = event.y - cnv.offsetTop;
-                for (let i = 1; i <= globalConfig.number_agents; ++i) {
-                    const agent = objectPool.acquire(() => new Agent());
-                    agent.setValueOnCreate(agents.length + 1, new Vector(x + i * 5, y), ctx, globalConfig.agent_size.y, globalConfig.agent_size.x, "green", walls, null);
-                    agent.setModul = new GreenModul(agents, agent);
-                    agent.setDestination = pointer.position;
-                    agent.modul.setTargetToEvade = agents[0];
-                    agents.push(agent);
-                }
+                createGreenAgent(x, y);
             });
             body.addEventListener('keydown', (event) => {
                 if (event.key == "d") {
@@ -75,7 +68,20 @@
             }
             drawBackground();
             setInterval(update, 20);
+            setInterval(() => {
+                createGreenAgent(Math.random() * (900 - 70) + 70, Math.random() * (400 - 70) + 70)
+            }, 5000);
             trainInterval = setInterval(spawnTrain, 10000);
+        }
+        function createGreenAgent(x, y) {
+            for (let i = 1; i <= globalConfig.number_agents; ++i) {
+                const agent = objectPool.acquire(() => new Agent());
+                agent.setValueOnCreate(agents.length + 1, new Vector(x + i * 5, y), ctx, globalConfig.agent_size.y, globalConfig.agent_size.x, "green", walls, null);
+                agent.setModul = new GreenModul(agents, agent);
+                agent.setDestination = pointer.position;
+                agent.modul.setTargetToEvade = agents[0];
+                agents.push(agent);
+            }
         }
         function update() {
             ctx.clearRect(0, 0, cnv.clientWidth, cnv.clientHeight);
